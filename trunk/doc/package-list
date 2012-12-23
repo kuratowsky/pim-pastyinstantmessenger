@@ -1,1 +1,6 @@
 com.pim
+com.pim.canal
+com.pim.gui
+com.pim.missatges
+com.pim.scribe
+org.eclipse.wb.swt
