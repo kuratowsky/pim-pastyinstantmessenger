@@ -10,8 +10,11 @@
  ******************************************************************************/
 package com.pim.gui;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -42,6 +45,8 @@ import rice.environment.Environment;
 import com.pim.*;
 import com.pim.canal.Canal;
 import com.pim.scribe.PimScribeClient;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Es presenta tota l'aplicació amb una sola finestra però amb tota la funcionalitat.
@@ -111,6 +116,18 @@ public class PimStart {
 	 */
 	private Combo cbCanalsDisponibles; 
 
+	private Menu menu;
+	private MenuItem mntmAsignaAlies;
+	
+	/**
+	 * Integer emb el valor del primer port lliure de la màquina
+	 */
+	private int port;
+	
+	/**
+	 * Botó que envia les dades dels caps de texte al constructor PIM
+	 */
+	private Button btCrearNodes;
 	/**
 	 * Objecte PIM amb la funcionalitats de manipulació de nodes
 	 */
@@ -125,6 +142,9 @@ public class PimStart {
 	 * Vector amb els canals creats a la pestanya de creació de canals
 	 */
 	private Vector<Canal> nousCanals = new Vector<Canal>(); 
+	
+	
+	
 	/**
 	 * Llança l'aplicació.
 	 * @param args
@@ -157,7 +177,7 @@ public class PimStart {
 	 * Crea els continguts de la finestra d'aplicació.
 	 */
 	protected void createContents() {
-		shlPimPastry = new Shell();
+		shlPimPastry = new Shell(SWT.ON_TOP | SWT.CLOSE | SWT.TITLE);//els parametres d'estil que li passam al constructor, fa que no sigui possible fer la finestra més gran o més petita.
 		shlPimPastry.setSize(1039, 584);
 		shlPimPastry.setText("Pim! - Pastry Instant Messenger");
 		shlPimPastry.setLayout(null);
@@ -249,7 +269,7 @@ public class PimStart {
 		sctbNodes.setExpandHorizontal(true);
 		sctbNodes.setExpandVertical(true);
 
-		tbNodes = new Table(sctbNodes, SWT.BORDER | SWT.FULL_SELECTION);
+		tbNodes = new Table(sctbNodes, SWT.BORDER);
 		tbNodes.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -269,6 +289,18 @@ public class PimStart {
 		TableColumn tbcAlies = new TableColumn(tbNodes, SWT.NONE);
 		tbcAlies.setWidth(123);
 		tbcAlies.setText("Alies");
+		
+		menu = new Menu(tbNodes);
+		tbNodes.setMenu(menu);
+		
+		mntmAsignaAlies = new MenuItem(menu, SWT.NONE);
+		if(pim==null)mntmAsignaAlies.setEnabled(false);
+		mntmAsignaAlies.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+		mntmAsignaAlies.setText("Asigna un \u00E0lies al node");
 
 		sctbNodes.setContent(tbNodes);
 		sctbNodes.setMinSize(tbNodes.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -281,30 +313,55 @@ public class PimStart {
 		grpDadesDeConnexi.setText("Dades de connexi\u00F3");
 		grpDadesDeConnexi.setBounds(10, 10, 600, 66);
 
+		try {
+			port = new ServerSocket(0).getLocalPort();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
 		txtPortLocal = new Text(grpDadesDeConnexi, SWT.BORDER);
 		txtPortLocal.setBounds(68, 25, 47, 19);
-		txtPortLocal.setText("9001");
+		txtPortLocal.setText(String.valueOf(port));
 
 		txtBootStap = new Text(grpDadesDeConnexi, SWT.BORDER);
 		txtBootStap.setBounds(179, 25, 112, 19);
-		txtBootStap.setText("10.2.56.23");
+		try {
+			txtBootStap.setText(InetAddress.getLocalHost().getHostAddress());
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		}
 
 
 		txtPortRemot = new Text(grpDadesDeConnexi, SWT.BORDER);
 		txtPortRemot.setBounds(361, 25, 47, 19);
-		txtPortRemot.setText("9001");
+		txtPortRemot.setText(String.valueOf(port));
 
 		txtNumNodes = new Text(grpDadesDeConnexi, SWT.BORDER);
 		txtNumNodes.setBounds(485, 25, 31, 19);
 
-		Button btCrearNodes = new Button(grpDadesDeConnexi, SWT.NONE);
+		btCrearNodes = new Button(grpDadesDeConnexi, SWT.NONE);
 		btCrearNodes.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				pim = creaPim();
-				Vector<PimScribeClient> v = pim.getApps();
-				fillNodeTable(tbNodes, v);
-				fillNodesCombo(cbNodesPerEnviarMissatge, v);
+				if(txtPortLocal.getText().length() > 0 && txtBootStap.getText().length() > 0 && txtPortRemot.getText().length() > 0 && txtNumNodes.getText().length() > 0){
+					pim = creaPim();
+					Vector<PimScribeClient> v = pim.getApps();
+					fillNodeTable(tbNodes, v);
+					fillNodesCombo(cbNodesPerEnviarMissatge, v);
+				}else if(txtPortLocal.getText().length() == 0){
+					alertWindow(SWT.ICON_WARNING, "Camp obligatori!", "El camp Port Local, és obligatòri");
+					txtPortLocal.setFocus();
+				}else if(txtBootStap.getText().length() == 0){
+					alertWindow(SWT.ICON_WARNING, "Camp obligatori!", "El camp bootstrap, és obligatòri");
+					txtBootStap.setFocus();
+				}else if(txtPortRemot.getText().length() == 0){
+					alertWindow(SWT.ICON_WARNING, "Camp obligatori!", "El camp Port remot, és obligatòri");
+					txtPortRemot.setFocus();
+				}else if(txtNumNodes.getText().length() == 0){
+					alertWindow(SWT.ICON_WARNING, "Camp obligatori!", "El camp Num. Nodes, és obligatòri");
+					txtNumNodes.setFocus();
+				}
 			}
 		});
 		btCrearNodes.setText("Crear Nodes");
@@ -487,7 +544,7 @@ public class PimStart {
 		cbCanalsPerEnviarMissatge = new Combo(grpMissatges, SWT.NONE);		
 		cbCanalsPerEnviarMissatge.setBounds(10, 117, 154, 21);
 
-		txtMissatgesEntreNodes = new Text(grpMissatges, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
+		txtMissatgesEntreNodes = new Text(grpMissatges, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 		txtMissatgesEntreNodes.setBounds(10, 164, 357, 298);
 
 		Label lblPerBenetJoan = new Label(grpMissatges, SWT.NONE);
@@ -574,7 +631,7 @@ public class PimStart {
 			int bootport = Integer.parseInt(txtPortRemot.getText());
 			InetSocketAddress bootaddress = new InetSocketAddress(bootaddr, bootport);
 			// the port to use locally
-			int numNodes = Integer.parseInt(txtNumNodes.getText());			
+			int numNodes = Integer.parseInt(txtNumNodes.getText());
 			return new PIM(bindport, bootaddress, numNodes, env, nousCanals.get(0));
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -600,6 +657,8 @@ public class PimStart {
 			item.setText(c++, psc.getAlies());		
 		}
 		tb.setRedraw(true);
+		mntmAsignaAlies.setEnabled(true);
+		btCrearNodes.setEnabled(false);
 	}
 
 	/**
