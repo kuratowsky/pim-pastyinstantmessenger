@@ -34,7 +34,13 @@ import rice.p2p.scribe.ScribeImpl;
 import rice.p2p.scribe.Topic;
 
 
-
+/**
+ * Classe que implementa <pre>ScribeClient</pre> per poder rebre missatges <pre>Scribe</pre> 
+ * i <pre>Application</pre> per poder rebre missatges de node a node, anomenem-lo privat.
+ * 
+ * @author Benet Joan Darder
+ *
+ */
 public class PimScribeClient implements ScribeClient, Application{
 	private int seqNum = 0;	
 	private Scribe pimScribe;
@@ -44,6 +50,10 @@ public class PimScribeClient implements ScribeClient, Application{
 	private Node node;
 	private StringBuffer missatges;
 
+	/**
+	 * Constructor de client Scribe.
+	 * @param node de tipus <pre>PastryNode</pre>
+	 */
 	public PimScribeClient(Node node) {
 		this.endpoint = node.buildEndpoint(this, "PIMinstance");
 		this.node = node;
@@ -53,36 +63,65 @@ public class PimScribeClient implements ScribeClient, Application{
 		this.alies = new String();
 	}
 
+	/**
+	 * Retorna l'endpoint de l'aplicació
+	 * @return enpoint
+	 */
 	public Endpoint getEndPoint(){
 		return this.endpoint;
 	}
 		
+	/**
+	 * Retorna els canals en els que l'aplicació está subscrita
+	 * @return vector amb tots els canals que l'aplicació s'ha subscrit
+	 */
 	public Vector<Canal> getCanalsSubscrits(){
 		return this.canalsSubscrits;
 	}
 	
+	/**
+	 * Retorna l'implementació Scribe 
+	 * @return Scribe
+	 */
 	public Scribe getScribe(){
 		return pimScribe;
 	}
 	
+	/**
+	 * Retorna el node 
+	 * @return node
+	 */
 	public Node getNode(){
 		return node;
 	}
 	
+	/**
+	 * Retorna els missatges enviats/rebuts de l'aplicació
+	 * @return missatges
+	 */
 	public String getMissatges(){
 		return this.missatges.toString();
 	}
 	
+	/**
+	 * Retorna l'àlies del node
+	 * @return àlies del node
+	 */
 	public String getAlies(){
 		return this.alies;
 	}
 	
+	/**
+	 * Canvia l'àlies del node
+	 * @param alies que volem donar-li al node
+	 */
 	public void setAlies(String alies){
 		this.alies = alies;
 	}
 	
 	/**
-	 * Mètode per subscriure a un canal. Detecta si un node ja estava subscrit a un canal.
+	 * Mètode per subscriure a un canal. 
+	 * Detecta si un node ja està subscrit a un canal. Si hi està no el deixa subscriure.
 	 * 
 	 * @param nomDelCanal Nom del canal que volem entrar
 	 * @param env Medi
@@ -122,17 +161,36 @@ public class PimScribeClient implements ScribeClient, Application{
 		}
 	}
 
+	/**
+	 * Envia missatges multicast a tot un canal en concret.
+	 * @param canal al que volem enviar el missatge
+	 * @param txt contingut del missatge
+	 * @return el missatge enviat
+	 */
 	public String sendMulticast(Canal canal, String txt) {
 		sendMulticast(canal.getTopic(),txt);
 		missatges.append("Missatge ").append(this.seqNum).append(" enviat al canal ").append(canal.getName()).append(" diu: ").append(txt).append("\n");
 		return missatges.toString();
 	}
+	
+	/**
+	 * Envia missatges multicast a tot un canal en concret.
+	 * @param tpc topic al que volem enviar el missatge
+	 * @param txt el missatge a enviar
+	 */
 	public void sendMulticast(Topic tpc, String txt) {
 		MissatgeXat missatge = new MissatgeXat(this.endpoint.getLocalNodeHandle(), this.seqNum, txt ,this.alies);
 		pimScribe.publish(tpc, missatge); 
 		this.seqNum++;
 	}
 	
+	/**
+	 * Mètode per enviar missatges directament a un node en concret.
+	 * 
+	 * @param nh <pre>NodeHandle</pre> del destinatari
+	 * @param msg Missatge a enviar
+	 * @return Missatge enviat
+	 */
 	public String routeMyMsgDirect(NodeHandle nh, String msg){
 		Id idFrom = this.endpoint.getId();
 		Id idTo = nh.getId();
@@ -142,6 +200,13 @@ public class PimScribeClient implements ScribeClient, Application{
 		return missatges.toString();
 	}
 
+	/**
+	 * Mètode per enviar missatges directament a un node en concret.
+	 * 
+	 * @param idTo <pre>Id</pre> del destinatari
+	 * @param msg Missatge a enviar
+	 * @return Missatge enviat
+	 */
 	public String routeMyMsgDirect(Id idTo, String msg){
 		Message missatge = new MissatgePrivat(this.endpoint.getId(), idTo, msg);
 		this.endpoint.route(idTo, missatge, null);
@@ -150,7 +215,7 @@ public class PimScribeClient implements ScribeClient, Application{
 	}
 
 	/**
-	 * Mètode que s'executa quan rebem els missatges.
+	 * Mètode que s'executa quan rebem els missatges <pre>Scribe</pre>.
 	 */
 	public void deliver(Topic topic, ScribeContent content) {
 		missatges.append("Missatge rebut al canal ").append(topic).append(" de ").append(((MissatgeXat)content).getFrom().getId().toString()).append(" diu ").append(((MissatgeXat)content).getContingut()).append(" \n");
@@ -160,7 +225,7 @@ public class PimScribeClient implements ScribeClient, Application{
 	}
 	
 	/**
-	 * Mètode que s'executa quan rebem els missatges.
+	 * Mètode que s'executa quan rebem els missatges privats (de node a node).
 	 */
 	@Override
 	public void deliver(Id id, Message msg) {
@@ -181,6 +246,10 @@ public class PimScribeClient implements ScribeClient, Application{
 		return pimScribe.getChildren(this.canalsSubscrits.get(0).getTopic()); 
 	}
 	
+	/**
+	 * Aquest mètode ha de retornar <pre>true</pre>!!!. 
+	 * Quin mal de cap! no me funcionava la recepció de node a node. Era perque el mètode retornava <pre>false</pre>.
+	 */
 	@Override
 	public boolean forward(RouteMessage arg0) {
 		// TODO Auto-generated method stub

@@ -14,7 +14,7 @@ import rice.p2p.commonapi.NodeHandle;
 import rice.p2p.scribe.ScribeContent;
 
 /**
- * Missatge de broadcast indicant el NodeHandler d'origen que demana altres canals oberts.
+ * Classe que modela un missatge de tipus <pre>rice.p2p.scribe.ScribeContent</pre>.
  * 
  * @author Benet Joan Darder
  *
@@ -25,11 +25,11 @@ public class MissatgeScribe implements ScribeContent{
 	/**
 	 * L'origen del contingut
 	 */
-	NodeHandle from;
+	protected NodeHandle from;
 	/**
 	 * Num de seqüència del contingut
 	 */
-	int seq;
+	protected int seq;
 	
 	/**
 	 * Constructor MissatgeScribe

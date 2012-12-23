@@ -41,38 +41,92 @@ import rice.environment.Environment;
 
 import com.pim.*;
 import com.pim.canal.Canal;
-import com.pim.missatges.*;
 import com.pim.scribe.PimScribeClient;
 
 /**
+ * Es presenta tota l'aplicació amb una sola finestra però amb tota la funcionalitat.
+ * 
+ * Part esquerra la funcionalitat de nodes i creació de canals, separat per pestanyes. 
+ * Part dreta la funcionalitat dels missatges, enviament i recepció.
  * 
  * @author Benet Joan Darder
  *
  */
 public class PimStart {
 
+	/**
+	 * Shell que es basa l'aplicació
+	 */
 	protected Shell shlPimPastry;
+	/**
+	 * Taula amb la llista de canals creats
+	 */
 	private Table tbLlistaCanals;
+	/**
+	 * Camp de text per escriure el nom del canal a crear
+	 */
 	private Text txtNomCanal;
+	/**
+	 * Taula amb els nodes creats
+	 */
 	private Table tbNodes;
+	/**
+	 * Camp de text per escriure el num de nodes a crear
+	 */
 	private Text txtNumNodes;
+	/**
+	 * Camp de text per escriure el port a utilitzar
+	 */
 	private Text txtPortRemot;
+	/**
+	 * Camp de text per escriure la ip per arrencar el node
+	 */
 	private Text txtBootStap;
+	/**
+	 * Camp de text per escriure el port local
+	 */
 	private Text txtPortLocal;
+	/**
+	 * Camp de text per escriure el missatge a enviar
+	 */
 	private Text txtMissatge;
+	/**
+	 * Camp de text que veim els missatges enviats/rebuts entre nodes
+	 */
 	private Text txtMissatgesEntreNodes;
+	/**
+	 * Taula amb els canals subscrits d'un node seleccionat de la taula de nodes
+	 */
 	private Table tbCanalsSubscrits;
-
+	/**
+	 * Desplegable de nodes de destí del missatge privat
+	 */
 	private Combo cbNodesPerEnviarMissatge;
+	/**
+	 * Desplegable de canals per enviar un missatge a tots els seus subscriptors
+	 */
 	private Combo cbCanalsPerEnviarMissatge;
+	/**
+	 * Desplegable de canals diponibles per subscriure-s'hi
+	 */
 	private Combo cbCanalsDisponibles; 
 
+	/**
+	 * Objecte PIM amb la funcionalitats de manipulació de nodes
+	 */
 	private PIM pim = null;
+	
+	/**
+	 * Objecte Medi de tipus rice.environment.Environment
+	 */
 	private Environment env;
-
+	
+	/**
+	 * Vector amb els canals creats a la pestanya de creació de canals
+	 */
 	private Vector<Canal> nousCanals = new Vector<Canal>(); 
 	/**
-	 * Launch the application.
+	 * Llança l'aplicació.
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -85,7 +139,7 @@ public class PimStart {
 	}
 
 	/**
-	 * Open the window.
+	 * Obre la finestra de l'aplicació.
 	 */
 	public void open() {
 		Display display = Display.getDefault();
@@ -100,7 +154,7 @@ public class PimStart {
 	}
 
 	/**
-	 * Create contents of the window.
+	 * Crea els continguts de la finestra d'aplicació.
 	 */
 	protected void createContents() {
 		shlPimPastry = new Shell();
@@ -381,6 +435,7 @@ public class PimStart {
 						}
 					}else{
 						alertWindow(SWT.ICON_INFORMATION, "Missatge buid!", "Es necessari que el camp missatge tingui contingut");
+						txtMissatge.setFocus();
 					}
 				}else{
 					alertWindow(SWT.ICON_INFORMATION, "No hi ha nodes ni canals", "No es pot enviar cap missatge, ja que no existeixen nodes ni canals");
@@ -419,6 +474,7 @@ public class PimStart {
 						}
 					}else{
 						alertWindow(SWT.ICON_INFORMATION, "Missatge buid!", "Es necessari que el camp missatge tingui contingut");
+						txtMissatge.setFocus();
 					}
 				}else{
 					alertWindow(SWT.ICON_INFORMATION, "No hi ha nodes ni canals", "No es pot enviar cap missatge, ja que no existeixen nodes ni canals");
@@ -500,11 +556,11 @@ public class PimStart {
 		fillChannelsCombo(cbCanalsPerEnviarMissatge,nousCanals);
 	}
 
-
-
 	/**
 	 * Crea un objecte PIM.
-	 * Crida el constructor de PIM que crea els nodes, crea l'anell i subscriu els nodes a un canal per defecte
+	 * Crida el constructor de PIM que crea els nodes, crea l'anell i subscriu els nodes a un canal per defecte.
+	 * 
+	 * L'objecte resultant, ens permetrá usar els mètodes de la classe PIM
 	 * 
 	 * @return objecte PIM
 	 */
@@ -622,7 +678,11 @@ public class PimStart {
 	}
 
 	/**
-	 * Alert Box
+	 * Mètode que mostra la finestra d'alerta segons els paràmetres que reb
+	 * 
+	 * @param typeIcon tipus d'icona segons el tipus d'alerta
+	 * @param title Títol de la finestra
+	 * @param message Missatge
 	 */
 	protected void alertWindow(int typeIcon, String title, String message){
 		MessageBox win = new MessageBox(shlPimPastry, typeIcon|SWT.ABORT);

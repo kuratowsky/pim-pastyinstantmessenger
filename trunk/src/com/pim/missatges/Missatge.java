@@ -14,7 +14,7 @@ import rice.p2p.commonapi.Id;
 import rice.p2p.commonapi.Message;
 
 /**
- * Missatge estandar
+ * Missatge estandar. Classe que implementa <pre>rice.p2p.commonapi.Message</pre> 
  * 
  * @author Benet Joan Darder
  *
@@ -30,21 +30,39 @@ public class Missatge implements Message{
 	 */
 	private Id to;
 
+	/**
+	 * Constructor buid
+	 */
 	public Missatge(){}
 	
+	/**
+	 * Constructor amb paràmetres
+	 * @param from qui envia el missatge
+	 * @param to cap a qui va el missatge
+	 */
 	public Missatge(Id from, Id to){
 		this.from = from;
 		this.to = to;
 	}
 
+	/**
+	 * Mètode que modela un <pre>String</pre> a partir de la informació de l'objecte
+	 */
 	public String toString(){
 		return "Missatge de: " + this.from + " a: "+this.to;
 	}
 
+	/**
+	 * Mètode que aplica la prioritat al missatge
+	 */
 	public int getPriority(){
 		return Message.LOW_PRIORITY;
 	}
 
+	/**
+	 * Mètode que retorna l'origen del missatge
+	 * @return id del node d'origen
+	 */
 	public Id getSender(){
 		return this.from;
 	}

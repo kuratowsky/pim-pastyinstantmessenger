@@ -36,9 +36,7 @@ public class Canal {
 		this.channelName = channelName;
 		this.topic = new Topic(new PastryIdFactory(env), channelName);
     }
-    public Canal() {
-		// TODO Auto-generated constructor stub
-	}
+    public Canal() {}
     
     /* Getters i setters */   
 
