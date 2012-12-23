@@ -31,33 +31,43 @@ import com.pim.scribe.PimScribeClient;
 public class PIM {
 	private Vector<PimScribeClient> apps = new Vector<PimScribeClient>();
 
+	/**
+	 * Crea tants de PastryNodes com el valor del paràmetre numNodes. Si existeix un anell ja creat, els nodes s'hi afegiran, si no s'en crearà un de nou.
+	 * Un cop creat l'anell, tots els nodes s'els hi aplica funcionalitat Scribe i es subscriuen a un canal per defecte.  
+	 * 
+	 * @param bindport Port local per enllaçar
+	 * @param bootaddress IP:port executar el node 
+	 * @param numNodes nombre de nodes a llançar
+	 * @param env Medi
+	 * @param canal Canal a subscriure
+	 * @throws Exception 
+	 */
 	public PIM(int bindport, InetSocketAddress bootaddress, int numNodes, Environment env, Canal canal) throws Exception {
 		// Construeix en PastryNodeFactory
-		PastryNodeFactory factory = new SocketPastryNodeFactory( new RandomNodeIdFactory(env), bindport, env);
+		PastryNodeFactory factory = new SocketPastryNodeFactory(new RandomNodeIdFactory(env), bindport, env);
 
 		// bulcle del constructor de nodes/apps
 		for (int curNode = 0; curNode < numNodes; curNode++) {
-			// construeix un nou node
+			// Construeix un nou node
 			PastryNode node = factory.newNode();
-			// construeix una nova aplicació Scribe
+			// Construeix una nova aplicació Scribe
 			PimScribeClient app = new PimScribeClient(node);
 			apps.add(app);
-			
+
 			node.boot(bootaddress);
-			// the node may require sending several messages to fully boot into the ring
+			// El node ha d'enviar varis missatges per entrar dins l'anell.
 			synchronized(node) {
 				while(!node.isReady() && !node.joinFailed()) {
-					// delay so we don't busy-wait
+					// esperem 
 					node.wait(500);		          
-					// abort if can't join
+					// aborten si no pot entrar
 					if (node.joinFailed()) {
 						throw new IOException("Could not join the FreePastry ring.  Reason:"+node.joinFailedReason()); 
 					}
 				}       
 			}
-			//System.out.println("Node creat correctament: " + node);
 		}
-		//subscrivim les aplicacions Scribe a un canal per defecte
+		// Subscrivim les aplicacions Scribe a un canal per defecte
 		for(PimScribeClient app:apps){
 			app.subscribe(canal.getName(), env);
 		}		
@@ -65,13 +75,13 @@ public class PIM {
 	}
 
 	/**
-	 * Retorna un vector amb els nodes Scribe
+	 * Retorna un vector amb tots els nodes Scribe
 	 * @return els nodes scribe
 	 */
 	public Vector<PimScribeClient> getApps(){
 		return apps;
 	}
-	
+
 	/**
 	 * Retorna un node Scribe del vector de nodes
 	 * 
@@ -81,7 +91,7 @@ public class PIM {
 	public PimScribeClient getAppByIndex(int i){
 		return apps.get(i);
 	}
-	
+
 	/**
 	 * Destrueix un node en concret del vector de nodes.
 	 * 
@@ -91,7 +101,7 @@ public class PIM {
 		PimScribeClient delapp = getAppByIndex(i);
 		((PastryNode)delapp.getNode()).destroy();
 		apps.remove(i);
-		
+
 	}
 	/**
 	 * Destrueix tots els nodes. S'utilitza quan tanquen l'aplicació, per alliberar tots els recursos utilitzats.
@@ -101,63 +111,14 @@ public class PIM {
 			deleteAppByIndex(i);
 		}
 	}
-	
+
+	/**
+	 * Sortim del canal
+	 * @param i posició que ocupa el canal dins el vector de canalsSubscrits
+	 * @param canal canal del que volem sortir
+	 */
 	public void sortirDelCanal(int i, String canal){
 		PimScribeClient appSortirCanal = getAppByIndex(i);
 		appSortirCanal.unsubscribe(canal);
 	}
-	
-	public static void printTree(Vector<PimScribeClient> apps) {
-		Hashtable<NodeHandle, PimScribeClient> appTable = new Hashtable<NodeHandle, PimScribeClient>();
-		Iterator<PimScribeClient> i = apps.iterator();
-
-		while (i.hasNext()) {
-			PimScribeClient app = (PimScribeClient) i.next();
-			appTable.put(app.getEndPoint().getLocalNodeHandle(), app);
-		}
-		NodeHandle seed = ((PimScribeClient) apps.get(0)).getEndPoint().getLocalNodeHandle();
-
-		// get the root
-		NodeHandle root = getRoot(seed, appTable);
-
-		System.out.println("Print Children");
-		// print the tree from the root down
-		recursivelyPrintChildren(root, 0, appTable);
-
-	}
-
-	/**
-	 * Recursively crawl up the tree to find the root.
-	 */
-	public static NodeHandle getRoot(NodeHandle seed, Hashtable<NodeHandle, PimScribeClient> appTable) {
-		PimScribeClient app = (PimScribeClient) appTable.get(seed);
-		if (app.isRoot())
-			return seed;
-		NodeHandle nextSeed = app.getParent();
-		return getRoot(nextSeed, appTable);
-	}
-
-	/**
-	 * Print's self, then children.
-	 */
-	public static void recursivelyPrintChildren(NodeHandle curNode,
-			int recursionDepth, Hashtable<NodeHandle, PimScribeClient> appTable) {
-		// print self at appropriate tab level
-		String s = "";
-		for (int numTabs = 0; numTabs < recursionDepth; numTabs++) {
-			s += "  ";
-		}
-		s += curNode.getId().toString();
-		System.out.println(s);
-
-		// recursively print all children
-		PimScribeClient app = (PimScribeClient) appTable.get(curNode);
-		NodeHandle[] children = app.getChildren();
-		for (int curChild = 0; curChild < children.length; curChild++) {
-			recursivelyPrintChildren(children[curChild], recursionDepth + 1, appTable);
-		}
-	}
-
-	
-
 }

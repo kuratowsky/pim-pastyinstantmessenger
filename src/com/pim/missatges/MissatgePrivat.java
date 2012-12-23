@@ -25,7 +25,7 @@ public class MissatgePrivat extends Missatge {
 	private String contingut;
 	
 	/**
-	 * Constructor del missatge
+	 * Constructor del missatge, amb contingut buid
 	 * 	
 	 * @param from qui ho envia
 	 * @param to a on ho envia
@@ -36,7 +36,7 @@ public class MissatgePrivat extends Missatge {
 	}
 	
 	/**
-	 * Constructor del missatge
+	 * Constructor del missatge, amb contingut a enviar
 	 * 
 	 * @param from qui ho envia
 	 * @param to a on ho envia
