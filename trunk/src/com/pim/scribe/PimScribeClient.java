@@ -59,8 +59,7 @@ public class PimScribeClient implements ScribeClient, Application{
 		this.node = node;
 		this.pimScribe = new ScribeImpl(node,"PIMScribeInstance");		
 		this.endpoint.register();
-		this.missatges = new StringBuffer();
-		this.alies = new String();
+		this.missatges = new StringBuffer();		
 	}
 
 	/**
@@ -102,23 +101,7 @@ public class PimScribeClient implements ScribeClient, Application{
 	public String getMissatges(){
 		return this.missatges.toString();
 	}
-	
-	/**
-	 * Retorna l'àlies del node
-	 * @return àlies del node
-	 */
-	public String getAlies(){
-		return this.alies;
-	}
-	
-	/**
-	 * Canvia l'àlies del node
-	 * @param alies que volem donar-li al node
-	 */
-	public void setAlies(String alies){
-		this.alies = alies;
-	}
-	
+		
 	/**
 	 * Mètode per subscriure a un canal. 
 	 * Detecta si un node ja està subscrit a un canal. Si hi està no el deixa subscriure.
@@ -179,7 +162,7 @@ public class PimScribeClient implements ScribeClient, Application{
 	 * @param txt el missatge a enviar
 	 */
 	public void sendMulticast(Topic tpc, String txt) {
-		MissatgeXat missatge = new MissatgeXat(this.endpoint.getLocalNodeHandle(), this.seqNum, txt ,this.alies);
+		MissatgeXat missatge = new MissatgeXat(this.endpoint.getLocalNodeHandle(), this.seqNum, txt);
 		pimScribe.publish(tpc, missatge); 
 		this.seqNum++;
 	}
@@ -231,19 +214,6 @@ public class PimScribeClient implements ScribeClient, Application{
 	public void deliver(Id id, Message msg) {
 		System.out.println("Id: " + id.toString() + " msg: " + msg);
 		missatges.append("Missatge privat rebut de ").append(((Missatge)msg).getSender().toString()).append(" diu ").append(((MissatgePrivat)msg).getContingut()).append(" \n");		
-	}
-
-	public boolean isRoot() {
-		return this.pimScribe.isRoot(this.canalsSubscrits.get(0).getTopic());
-	}
-
-	public NodeHandle getParent() {
-		return pimScribe.getParent(this.canalsSubscrits.get(0).getTopic());
-	}
-
-	@SuppressWarnings("deprecation")
-	public NodeHandle[] getChildren() {
-		return pimScribe.getChildren(this.canalsSubscrits.get(0).getTopic()); 
 	}
 	
 	/**

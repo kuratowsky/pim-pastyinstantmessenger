@@ -22,19 +22,16 @@ import rice.p2p.commonapi.NodeHandle;
 public class MissatgeXat extends MissatgeScribe{
 	
 	private static final long serialVersionUID = 8415628263338234041L;
-	private String alies;
 	private String contingut;
 	
 	/**
 	 * Constructor del missatge amb paràmetres
 	 * @param from node origen del missatge
 	 * @param seq num de seqüència del missatge
-	 * @param contingut Contingut del missatge
-	 * @param alies del qui envia el missatge
+	 * @param contingut Contingut del missatge 
 	 */
-	public MissatgeXat(NodeHandle from, int seq, String contingut, String alies){
+	public MissatgeXat(NodeHandle from, int seq, String contingut){
 		super(from, seq);
-		this.alies = alies;
 		this.contingut = contingut;
 	}
 	/**
@@ -57,7 +54,7 @@ public class MissatgeXat extends MissatgeScribe{
 	 * Mètode que modela l'objecte <pre>MissatgeXat</pre> a tipus <pre>String</pre>
 	 */
 	public String toString(){
-		return this.alies+" diu: "+this.contingut;
+		return this.from+" diu: "+this.contingut;
 	}
 
 }

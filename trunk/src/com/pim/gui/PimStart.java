@@ -269,7 +269,7 @@ public class PimStart {
 		sctbNodes.setExpandHorizontal(true);
 		sctbNodes.setExpandVertical(true);
 
-		tbNodes = new Table(sctbNodes, SWT.BORDER);
+		tbNodes = new Table(sctbNodes, SWT.BORDER | SWT.FULL_SELECTION);
 		tbNodes.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -283,12 +283,8 @@ public class PimStart {
 		tbNodes.setLinesVisible(true);
 
 		TableColumn tbcIdNode = new TableColumn(tbNodes, SWT.NONE);
-		tbcIdNode.setWidth(374);
+		tbcIdNode.setWidth(556);
 		tbcIdNode.setText("Id Node");
-
-		TableColumn tbcAlies = new TableColumn(tbNodes, SWT.NONE);
-		tbcAlies.setWidth(123);
-		tbcAlies.setText("Alies");
 		
 		menu = new Menu(tbNodes);
 		tbNodes.setMenu(menu);
@@ -654,7 +650,6 @@ public class PimStart {
 			int c = 0;
 			TableItem item = new TableItem(tb, SWT.NONE);
 			item.setText(c++, psc.getEndPoint().getId().toStringFull());
-			item.setText(c++, psc.getAlies());		
 		}
 		tb.setRedraw(true);
 		mntmAsignaAlies.setEnabled(true);
