@@ -459,7 +459,6 @@ public class PimStart {
 							PimScribeClient appFrom = v.get(ndFromindex);
 							PimScribeClient appTo = v.get(ndToindex);
 							if (appFrom != appTo){
-								//txtMissatgesEntreNodes.setText(appFrom.routeMyMsgDirect(appTo.getEndPoint().getLocalNodeHandle(), txt));
 								txtMissatgesEntreNodes.setText(appFrom.routeMyMsgDirect(appTo.getEndPoint().getId(), txt));
 							}else{
 								alertWindow(SWT.ICON_WARNING, "Selecciona Node", "El node de destí ha de ser diferent al d'origen");	
