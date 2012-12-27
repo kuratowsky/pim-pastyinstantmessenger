@@ -115,9 +115,6 @@ public class PimStart {
 	 * Desplegable de canals diponibles per subscriure-s'hi
 	 */
 	private Combo cbCanalsDisponibles; 
-
-	private Menu menu;
-	private MenuItem mntmAsignaAlies;
 	
 	/**
 	 * Integer emb el valor del primer port lliure de la màquina
@@ -286,18 +283,6 @@ public class PimStart {
 		tbcIdNode.setWidth(556);
 		tbcIdNode.setText("Id Node");
 		
-		menu = new Menu(tbNodes);
-		tbNodes.setMenu(menu);
-		
-		mntmAsignaAlies = new MenuItem(menu, SWT.NONE);
-		if(pim==null)mntmAsignaAlies.setEnabled(false);
-		mntmAsignaAlies.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
-		mntmAsignaAlies.setText("Asigna un \u00E0lies al node");
-
 		sctbNodes.setContent(tbNodes);
 		sctbNodes.setMinSize(tbNodes.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
@@ -652,7 +637,6 @@ public class PimStart {
 			item.setText(c++, psc.getEndPoint().getId().toStringFull());
 		}
 		tb.setRedraw(true);
-		mntmAsignaAlies.setEnabled(true);
 		btCrearNodes.setEnabled(false);
 	}
 
