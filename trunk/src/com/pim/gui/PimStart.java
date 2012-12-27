@@ -45,8 +45,6 @@ import rice.environment.Environment;
 import com.pim.*;
 import com.pim.canal.Canal;
 import com.pim.scribe.PimScribeClient;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Es presenta tota l'aplicació amb una sola finestra però amb tota la funcionalitat.

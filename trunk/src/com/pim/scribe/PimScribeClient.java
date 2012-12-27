@@ -41,12 +41,12 @@ import rice.p2p.scribe.Topic;
  * @author Benet Joan Darder
  *
  */
+@SuppressWarnings("deprecation")
 public class PimScribeClient implements ScribeClient, Application{
 	private int seqNum = 0;	
 	private Scribe pimScribe;
 	private Endpoint endpoint;
 	private Vector<Canal> canalsSubscrits = new Vector<Canal>();
-	private String alies;
 	private Node node;
 	private StringBuffer missatges;
 

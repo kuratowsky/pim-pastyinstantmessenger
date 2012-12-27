@@ -11,15 +11,10 @@
 package com.pim;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Vector;
 
 import rice.environment.Environment;
-import rice.p2p.commonapi.NodeHandle;
-import rice.pastry.NodeIdFactory;
 import rice.pastry.PastryNode;
 import rice.pastry.PastryNodeFactory;
 import rice.pastry.socket.SocketPastryNodeFactory;
